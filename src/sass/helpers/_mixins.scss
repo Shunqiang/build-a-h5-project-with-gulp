@@ -1,0 +1,219 @@
+//单行文本超出隐藏，显示...
+@mixin ell() {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    -o-text-overflow:ellipsis;
+    -ms-text-overflow: ellipsis;
+    white-space:nowrap;
+}
+
+// Display
+@mixin display-flex {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flexbox;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+  
+@mixin opacity($opacity:50) { 
+	opacity: $opacity / 100; 
+	filter: alpha(opacity=$opacity); 
+}
+
+@mixin inlineBlock($alignment: $inline-block-alignment) { 
+	display: inline-block; 
+	@if $alignment and $alignment != none { 
+		vertical-align: $alignment; 
+	} 
+	@if $legacy-support-for-ie { 
+		/**vertical-align: auto;*/ zoom: 1; *display: inline; 
+	} 
+}
+
+@mixin minHeight($height){ 
+	min-height: $height; 
+	height: auto !important; 
+	@if $legacy-support-for-ie { 
+		_height: $height; 
+	} 
+}
+
+@mixin minWidth($width){
+  display: inline-block;  
+  min-width: $width + px;  
+  *min-width: auto;  
+  *width: expression(this.offsetWidth < $width ? 'auto' : $width + px);
+}
+
+//$width 只能传数字
+@mixin maxWidth($width){
+    max-width:$width + px; 
+    _width:expression((document.documentElement.clientWidth||document.body.clientWidth)<$width ? $width + px :"");
+    overflow:hidden;
+}
+
+.className { 
+max-width:1000px; 
+_width:expression((document.documentElement.clientWidth||document.body.clientWidth)<1000?"1000px":""); 
+overflow:hidden; 
+} 
+
+@mixin clearfix{
+    &:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 0;
+    }
+    *zoom:1;
+}
+
+//浏览器前缀自动添加 Example: @include css3(border-radius,30px)
+@mixin css3($property, $value) { 
+	@each $prefix in -webkit-, -moz-, -ms-, -o-, '' { 
+		#{$prefix}#{$property}: $value;
+    }
+}
+
+//rgba颜色格式兼容(包含透明度) Example: @include rgba(rgba(0, 0, 0, 0.84))
+@mixin rgba($rgba){
+    filter:progid:DXImageTransform.Microsoft.gradient(enabled='true',startColorstr= #{ie-hex-str($rgba)}, endColorstr= #{ie-hex-str($rgba)});
+    :root & { filter:none;background-color:$rgba;}
+}
+
+
+@mixin keyframes($animationName) {
+    @-webkit-keyframes #{$animationName} {
+        $browser: '-webkit-' !global;
+        @content;
+    }
+    @-moz-keyframes #{$animationName} {
+        $browser: '-moz-' !global;
+        @content;
+    }
+    @-o-keyframes #{$animationName} {
+        $browser: '-o-' !global;
+        @content;
+    }
+    @keyframes #{$animationName} {
+        $browser: '' !global;
+        @content;
+    }
+} $browser: null;
+
+
+//triangle三角形
+@mixin triangle ($size, $color, $direction) { 
+    height: 0; width: 0; 
+    //三角向上、向下、向右和向左时，设置边框样式 
+    @if ($direction == up) or ($direction == down) or ($direction == right) or ($direction == left) { 
+        border-color: transparent; border-style: solid; border-width: $size / 2; 
+        //三角向上时，底部边框颜色为$color 
+        @if $direction == up { 
+            border-bottom-color: $color; 
+            //三角向右时，左边边框颜色为$color 
+        } @else if $direction == right { 
+            border-left-color: $color; 
+            //三你向下时，顶部边框颜色为$color 
+        } @else if $direction == down { 
+            border-top-color: $color; 
+            //三角向左时，右边框颜色为$color 
+        } @else if $direction == left { 
+            border-right-color: $color; 
+        } 
+    } 
+    //当三角为左上、右上直角三角形时 
+    @else if ($direction == up-right) or ($direction == up-left) { 
+        border-top: $size solid $color;
+        //顶边边框样式 
+        //当三角为右上直角三角形时，设置左边边框为透明 
+        @if $direction == up-right { 
+            border-left: $size solid transparent; 
+            //当三角为左上直角三角形时，设置右边边框为透明 
+        } @else if $direction == up-left {
+            border-right: $size solid transparent; 
+        } 
+    } 
+    //当三角为右下、左下直角三角形时 
+    @else if ($direction == down-right) or ($direction == down-left) {
+         border-bottom: $size solid $color;
+        //底边边框样式 
+        //当三角为右下直角三角形时，设置左边边框为透明 
+        @if $direction == down-right { 
+            border-left: $size solid transparent; 
+            //当三你为左下直角三角形时，设置右边边框为透明 
+        } @else if $direction == down-left { 
+            border-right: $size solid transparent; 
+        } 
+    } 
+}
+
+//渐变色
+@mixin linear-gradient($color-from, $color-to, $type: vertical) {
+  @if $color-from and $color-to {   
+      $alpha: alpha($color-to);
+  @if $alpha < 1 {
+    $color-rgb: change_color($color, $alpha: 1); background-color: $color-rgb;
+  }
+  @else {
+    background-color: $color-to;
+  }
+  $ie-from: ie-hex-str($color-from);
+  $ie-to: ie-hex-str($color-to);  
+  $webkit: 'left top, left bottom';
+  $spec: 'top';
+  $ie: 0;  
+  @if $type == vertical {
+    $webkit: 'left top, left bottom';$spec: 'top';$ie: 0;
+  }
+  @if $type == horizontal {
+    $webkit: 'left top, right top';$spec: 'to right';$ie: 1;
+  }
+  @if $type == left-right {
+     $webkit: 'left top, right bottom';$spec: '135deg';$ie: 1;
+  }
+  @if $type == right-left {
+    $webkit: 'left bottom, right top';$spec: '45deg';$ie: 1;
+  } 
+  background-image: -webkit-gradient($type, #{$webkit}, from($color-from), to($color-to));
+  background-image: -webkit-linear-gradient(#{$spec}, $color-from, $color-to);
+  background-image: linear-gradient(#{$spec}, $color-from, $color-to);
+  -ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$ie-from}', endColorstr='#{$ie-to}', GradientType=#{$ie});
+  }
+}
+@mixin text-linear-gradient($color-from, $color-to, $type: vertical) {
+  @if $color-from and $color-to {   
+      $alpha: alpha($color-to);
+  @if $alpha < 1 {
+    $color-rgb: change_color($color, $alpha: 1); color: $color-rgb;
+  }
+  @else {
+    color: $color-to;
+  }
+  $ie-from: ie-hex-str($color-from);
+  $ie-to: ie-hex-str($color-to);  
+  $webkit: 'left top, left bottom';
+  $spec: 'top';
+  $ie: 0;  
+  @if $type == vertical {
+    $webkit: 'left top, left bottom';$spec: 'top';$ie: 0;
+  }
+  @if $type == horizontal {
+    $webkit: 'left top, right top';$spec: 'to right';$ie: 1;
+  }
+  @if $type == left-right {
+     $webkit: 'left top, right bottom';$spec: '135deg';$ie: 1;
+  }
+  @if $type == right-left {
+    $webkit: 'left bottom, right top';$spec: '45deg';$ie: 1;
+  } 
+  mask-image: -webkit-gradient($type, #{$webkit}, from($color-from), to($color-to));
+  mask-image: -webkit-linear-gradient(#{$spec}, $color-from, $color-to);
+  mask-image: linear-gradient(#{$spec}, $color-from, $color-to);
+  -ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$ie-from}', endColorstr='#{$ie-to}', GradientType=#{$ie});
+  }
+}
