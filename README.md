@@ -1,4 +1,4 @@
-# build-a-h5-project-with-gulp
+
 #打包目录说明
 
 本工程适合小型h5开发。
